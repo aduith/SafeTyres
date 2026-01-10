@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
@@ -18,6 +18,7 @@ const AdminNavbar = () => {
         { to: '/admin/products', label: 'Products', icon: Package },
         { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
         { to: '/admin/users', label: 'Users', icon: Users },
+        { to: '/admin/reviews', label: 'Reviews', icon: Star },
     ];
 
     return (

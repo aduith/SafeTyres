@@ -107,6 +107,22 @@ class AdminService {
         const response = await apiClient.patch(`/users/${userId}/role`, { role });
         return response.data.data.user;
     }
+
+    // Reviews
+    async getAllReviews(status?: string): Promise<any[]> {
+        const params = status ? { status } : {};
+        const response = await apiClient.get('/reviews/all', { params });
+        return response.data.data.reviews;
+    }
+
+    async updateReviewStatus(reviewId: string, status: 'pending' | 'approved' | 'rejected'): Promise<any> {
+        const response = await apiClient.patch(`/reviews/${reviewId}/status`, { status });
+        return response.data.data.review;
+    }
+
+    async deleteReview(reviewId: string): Promise<void> {
+        await apiClient.delete(`/reviews/${reviewId}`);
+    }
 }
 
 export default new AdminService();

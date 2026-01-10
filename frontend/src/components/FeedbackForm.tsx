@@ -5,20 +5,47 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
+import StarRating from './StarRating';
+import reviewService from '@/services/reviewService';
 
 const FeedbackForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    message: '',
+    rating: 0,
+    comment: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Thank you for your feedback!', {
-      description: 'We will get back to you soon.',
-    });
-    setFormData({ name: '', email: '', message: '' });
+
+    if (formData.rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await reviewService.submitReview({
+        name: formData.name,
+        email: formData.email,
+        rating: formData.rating,
+        comment: formData.comment,
+      });
+
+      toast.success('Thank you for your review!', {
+        description: 'Your review will be visible after approval.',
+      });
+
+      setFormData({ name: '', email: '', rating: 0, comment: '' });
+    } catch (error: any) {
+      toast.error('Failed to submit review', {
+        description: error.response?.data?.message || 'Please try again later',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -34,10 +61,10 @@ const FeedbackForm = () => {
         <Card className="max-w-2xl mx-auto border-border shadow-glow animate-fade-in">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl">
-              Share Your <span className="text-primary">Feedback</span>
+              Share Your <span className="text-primary">Review</span>
             </CardTitle>
             <CardDescription className="text-base">
-              We'd love to hear from you. Send us your thoughts or questions.
+              We'd love to hear about your experience with our products.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -74,24 +101,44 @@ const FeedbackForm = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Message
+                <label className="text-sm font-medium">
+                  Rating
+                </label>
+                <StarRating
+                  rating={formData.rating}
+                  onRatingChange={(rating) => setFormData((prev) => ({ ...prev, rating }))}
+                  size="lg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="comment" className="text-sm font-medium">
+                  Your Review
                 </label>
                 <Textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
+                  id="comment"
+                  name="comment"
+                  value={formData.comment}
                   onChange={handleChange}
                   placeholder="Tell us what you think..."
                   required
                   rows={5}
+                  maxLength={500}
                   className="bg-background border-border focus:border-primary resize-none"
                 />
+                <p className="text-xs text-muted-foreground text-right">
+                  {formData.comment.length}/500 characters
+                </p>
               </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90" size="lg">
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90"
+                size="lg"
+                disabled={isSubmitting}
+              >
                 <Send className="mr-2 h-4 w-4" />
-                Send Feedback
+                {isSubmitting ? 'Submitting...' : 'Submit Review'}
               </Button>
             </form>
           </CardContent>
