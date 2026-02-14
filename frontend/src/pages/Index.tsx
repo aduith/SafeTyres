@@ -4,6 +4,7 @@ import ProductCarousel from '@/components/ProductCarousel';
 import ProductCard from '@/components/ProductCard';
 import ProductAdvantages from '@/components/ProductAdvantages';
 import UsageInstructions from '@/components/UsageInstructions';
+import DosageChart from '@/components/DosageChart';
 import ReviewsSection from '@/components/ReviewsSection';
 import FeedbackForm from '@/components/FeedbackForm';
 import Navbar from '@/components/Navbar';
@@ -75,6 +76,8 @@ const Index = () => {
       <ProductAdvantages />
 
       <UsageInstructions />
+
+      <DosageChart />
 
       <ReviewsSection />
 

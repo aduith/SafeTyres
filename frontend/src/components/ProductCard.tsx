@@ -22,7 +22,7 @@ const ProductCard = ({ id, name, size, price, image, popular }: ProductCardProps
   const handleAddToCart = async () => {
     try {
       setIsAdding(true);
-      await addItem({ id, name, size, price, image });
+      await addItem({ id, productId: id, name, size, price, image });
       toast.success('Added to cart!', {
         description: `${name} (${size}) has been added to your cart.`,
         icon: <Check className="h-4 w-4" />,

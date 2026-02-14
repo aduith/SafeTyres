@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo1.png';
 
 const AdminNavbar = () => {
     const { user, logout } = useAuth();
