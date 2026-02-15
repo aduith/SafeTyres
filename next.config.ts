@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    outputFileTracingRoot: "/Users/aduiths/Downloads/SafeTyres/SafeTyres",
 };
 
 export default nextConfig;
