@@ -92,11 +92,17 @@ export async function POST(req: NextRequest) {
             customerInfo: {
                 name: user.name,
                 email: user.email,
-                phone: user.phone || '',
+                phone: shippingAddress.phone || user.phone || '',
             },
             items: orderItems,
             totalAmount,
-            shippingAddress,
+            shippingAddress: {
+                street: shippingAddress.street,
+                city: shippingAddress.city,
+                state: shippingAddress.state,
+                zipCode: shippingAddress.zipCode,
+                country: shippingAddress.country,
+            },
             paymentMethod: paymentMethod || 'card',
         });
 

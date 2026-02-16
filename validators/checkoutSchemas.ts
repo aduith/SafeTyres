@@ -6,6 +6,7 @@ export const shippingAddressSchema = z.object({
     state: z.string().min(2, 'State must be at least 2 characters'),
     zipCode: z.string().regex(/^\d{5,6}$/, 'Please enter a valid ZIP code'),
     country: z.string().min(2, 'Country must be at least 2 characters'),
+    phone: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit mobile number'),
 });
 
 // This ensures the inferred type matches ShippingAddress exactly

@@ -11,6 +11,7 @@ export interface ShippingAddress {
     state: string;
     zipCode: string;
     country: string;
+    phone: string;
 }
 
 export interface CreateOrderData {

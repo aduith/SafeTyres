@@ -13,15 +13,27 @@ import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
-import { MapPin, User, Package } from 'lucide-react';
+import { MapPin, User, Package, Phone } from 'lucide-react';
 import orderService from '@/services/orderService';
 import { shippingAddressSchema, ShippingAddressFormData } from '@/validators/checkoutSchemas';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [formData, setFormData] = useState<ShippingAddressFormData | null>(null);
 
   // Check authentication on mount
   useEffect(() => {
@@ -42,9 +54,17 @@ const Checkout = () => {
     resolver: zodResolver(shippingAddressSchema),
   });
 
-  const onSubmit = async (data: ShippingAddressFormData) => {
+  const handleFormSubmit = (data: ShippingAddressFormData) => {
+    setFormData(data);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmOrder = async () => {
+    if (!formData) return;
+
     try {
       setIsSubmitting(true);
+      setShowConfirmDialog(false);
 
       // Create order with backend - use productId not cart item id
       const order = await orderService.createOrder({
@@ -53,12 +73,13 @@ const Checkout = () => {
           quantity: item.quantity,
         })),
         shippingAddress: {
-          street: data.street,
-          city: data.city,
-          state: data.state,
-          zipCode: data.zipCode,
-          country: data.country,
-        } as import('@/services/orderService').ShippingAddress,
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          country: formData.country,
+          phone: formData.phone,
+        },
         paymentMethod: 'card', // Placeholder - would integrate real payment gateway
       });
 
@@ -103,7 +124,7 @@ const Checkout = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
                 {/* Customer Information (Read-only from user profile) */}
                 <Card className="animate-scale-in bg-muted/30">
                   <CardHeader>
@@ -134,10 +155,26 @@ const Checkout = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MapPin className="h-5 w-5 text-primary" />
-                      Shipping Address
+                      Shipping Address & Contact
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Mobile Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          {...register('phone')}
+                          placeholder="10-digit mobile number"
+                          className={`pl-10 ${errors.phone ? 'border-destructive' : ''}`}
+                        />
+                      </div>
+                      {errors.phone && (
+                        <p className="text-sm text-destructive">{errors.phone.message}</p>
+                      )}
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="street">Street Address</Label>
                       <Input
@@ -253,6 +290,27 @@ const Checkout = () => {
           </div>
         </div>
       </main>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent className="max-w-[400px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Is {formData?.phone} your number?</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              On clicking <strong>Purchase Now</strong>, we will be contacting you through your provided phone number, So please check if the provided number is correct!.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto mt-0">Check Number</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmOrder}
+              className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Purchase Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Footer />
     </div>

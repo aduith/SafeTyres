@@ -137,6 +137,9 @@ const OrderManagement = () => {
                                                 <p className="text-sm text-muted-foreground mb-1">Customer</p>
                                                 <p className="font-medium">{order.customerInfo?.name || order.user?.name || 'Customer'}</p>
                                                 <p className="text-sm text-muted-foreground">{order.customerInfo?.email || order.user?.email || 'N/A'}</p>
+                                                {order.customerInfo?.phone && (
+                                                    <p className="text-sm font-medium text-primary mt-1">{order.customerInfo.phone}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <p className="text-sm text-muted-foreground mb-1">Shipping Address</p>

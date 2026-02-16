@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import dbConnect from './lib/db';
 import Product from './lib/models/Product';
