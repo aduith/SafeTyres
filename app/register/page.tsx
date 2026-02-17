@@ -57,6 +57,7 @@ const Register = () => {
                 setShowOTPDialog(true);
                 toast.success('Verification code sent to your email!');
             } else {
+                toast.success('Registration successful. Welcome!');
                 router.push('/');
             }
         } catch (err: any) {

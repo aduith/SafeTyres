@@ -18,7 +18,7 @@ export async function sendOTP(email: string, otp: string) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'SafeTyres <onboarding@resend.dev>', // Default for testing, user should verify domain for custom sender
+      from: process.env.RESEND_FROM_EMAIL || 'SafeTyres <onboarding@resend.dev>',
       to: [email],
       subject: 'Verify your SafeTyres Account',
       html: `

@@ -45,7 +45,11 @@ class AuthService {
     async register(data: RegisterData): Promise<AuthResponse> {
         const response = await apiClient.post<AuthResponse>('/auth/register', data);
 
-        // Don't set user yet, wait for verification
+        if (response.data.success && response.data.data.token && response.data.data.user) {
+            localStorage.setItem('authToken', response.data.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        }
+
         return response.data;
     }
 

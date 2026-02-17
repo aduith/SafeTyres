@@ -38,6 +38,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const register = async (name: string, email: string, password: string, phone?: string) => {
         const response = await authService.register({ name, email, password, phone });
+        if (response.success && response.data.user) {
+            setUser(response.data.user);
+        }
         return {
             otpSent: response.data.otpSent,
             email: response.data.email

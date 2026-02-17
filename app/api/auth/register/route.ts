@@ -32,28 +32,58 @@ export async function POST(req: NextRequest) {
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+        const bypassOTP = process.env.BYPASS_EMAIL_OTP === 'true';
+
         let user;
         if (existingUser) {
-            // Update existing unverified user with new OTP
+            // Update existing unverified user
             existingUser.name = name;
             existingUser.password = password;
             existingUser.phone = phone;
             existingUser.address = address;
-            existingUser.otp = otp;
-            existingUser.otpExpires = otpExpires;
+            if (bypassOTP) {
+                existingUser.isVerified = true;
+                existingUser.otp = undefined;
+                existingUser.otpExpires = undefined;
+            } else {
+                existingUser.otp = otp;
+                existingUser.otpExpires = otpExpires;
+            }
             user = await existingUser.save();
         } else {
-            // Create new user (unverified)
+            // Create new user
             user = await User.create({
                 name,
                 email,
                 password,
                 phone,
                 address,
-                isVerified: false,
-                otp,
-                otpExpires,
+                isVerified: bypassOTP,
+                otp: bypassOTP ? undefined : otp,
+                otpExpires: bypassOTP ? undefined : otpExpires,
             });
+        }
+
+        if (bypassOTP) {
+            const token = generateToken({
+                userId: user._id.toString(),
+                email: user.email,
+                role: user.role,
+            });
+            return NextResponse.json({
+                success: true,
+                message: 'Registration successful!',
+                data: {
+                    user: {
+                        id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role
+                    },
+                    token,
+                    otpSent: false
+                }
+            }, { status: 201 });
         }
 
         // Send OTP Email
